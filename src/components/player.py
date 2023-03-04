@@ -6,7 +6,6 @@ from src.services.visualization_service import VisualizationService
 
 vec = pygame.math.Vector2
 
-
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -18,20 +17,33 @@ class Player(pygame.sprite.Sprite):
         self.acc = vec(0, 0)
         self.player_position = vec(0, 0)
 
-    def update(self):
+    def update(self, movement_direction, normalized_position):
+        
         self.acc = vec(0, 0)
-
+        
         pressed_keys = pygame.key.get_pressed()
-
-        if pressed_keys[K_LEFT] or pressed_keys[K_a]:
-            self.acc.x = -Config.ACC
-        if pressed_keys[K_RIGHT] or pressed_keys[K_d]:
-            self.acc.x = +Config.ACC
-        if pressed_keys[K_UP] or pressed_keys[K_w]:
-            self.acc.y = -Config.ACC
-        if pressed_keys[K_DOWN] or pressed_keys[K_s]:
-            self.acc.y = +Config.ACC
-
+        
+        if type (movement_direction) == type (None):#isinstance(movement_direction,None): 
+            
+            if pressed_keys[K_LEFT] or pressed_keys[K_a]:
+                self.acc.x = -Config.ACC
+            if pressed_keys[K_RIGHT] or pressed_keys[K_d]:
+                self.acc.x = +Config.ACC
+            if pressed_keys[K_UP] or pressed_keys[K_w]:
+                self.acc.y = -Config.ACC
+            if pressed_keys[K_DOWN] or pressed_keys[K_s]:
+                self.acc.y = +Config.ACC
+                
+        else:
+            if not(movement_direction[0]):
+                self.acc.x = -Config.ACC
+            if movement_direction[0]:
+                self.acc.x = +Config.ACC
+            if movement_direction[1]:
+                self.acc.y = -Config.ACC
+            if not(movement_direction[1]):
+                self.acc.y = +Config.ACC
+        
         self.acc.x += self.vel.x * Config.FRIC
         self.acc.y += self.vel.y * Config.FRIC
         self.vel += self.acc
@@ -47,7 +59,11 @@ class Player(pygame.sprite.Sprite):
             self.pos.y = Config.HEIGHT
         if self.pos.y < 200:
             self.pos.y = 200
-
+        
+        if normalized_position != None:
+            self.pos.x = Config.WIDTH*(1-normalized_position[0])
+            self.pos.y = Config.HEIGHT*normalized_position[1]
+        
         self.rect.center = self.pos
 
     def draw(self, screen):
